@@ -5,10 +5,13 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,14 +20,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import java.awt.SystemColor;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class Prime extends JFrame {
-	JPanel painelUpdate;
 	Robot optimusPrime;
-
+	
 	JLabel mousePosition;
 
 	private int h = 0;
@@ -36,22 +40,24 @@ public class Prime extends JFrame {
 	private int s2 = 0;
 	private int cont = 0;
 	private boolean rodando = false;
+	private boolean horaRoda = false;
 
-	private JLabel horaTotal, update;
-	private Timer tm;
+	private JLabel horaTotal, update, hora;
+	private Timer tm,tm2;
 
 	private JButton start, stop;
 
 	private JPanel painel;
 	private JLabel lblNewLabel_2;
-	private JPanel atualiza;
-	private JTextField posX;
-	private JTextField posY;
 
+	double p, p1;
+	private JLabel lblNewLabel;
+
+	
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+		public static void main(String[] args) {
 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -71,74 +77,50 @@ public class Prime extends JFrame {
 	 * Create the frame.
 	 */
 	public Prime() {
-		setTitle("Cronometro");
+		setForeground(new Color(0, 0, 0));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("A:\\Programacao\\Udemy\\Rolito-master\\img\\robolito.png"));
+
+		setTitle("Cronometro                  Versão:1.0");
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 427, 330);
+		setBounds(100, 100, 657, 465);
 		painel = new JPanel();
 		painel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(painel);
 		painel.setLayout(null);
 
 		// altera a cor do Jpanel
-		painel.setBackground(Color.CYAN);
-
-		painelUpdate = new JPanel();
-		painelUpdate.setBounds(47, 36, 200, 53);
-		painel.add(painelUpdate);
-		painelUpdate.setSize(200, 78);
-
-		horaTotal = new JLabel("00:00:00");
-		painelUpdate.add(horaTotal);
-		horaTotal.setFont(new Font(horaTotal.getName(), Font.PLAIN, 50));
-
-		atualiza = new JPanel();
-		atualiza.setBounds(134, 205, 151, 75);
-		painel.add(atualiza);
-
-		update = new JLabel("00");
-		atualiza.add(update);
-		update.setFont(new Font(update.getName(), Font.PLAIN, 50));
+		painel.setBackground(new Color(255, 69, 0));
 
 		JLabel lblNewLabel_1 = new JLabel("Monitoramento Total");
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_1.setBounds(47, 11, 200, 14);
+		lblNewLabel_1.setBounds(274, 11, 200, 14);
 		painel.add(lblNewLabel_1);
 
+		
 		start = new JButton("Start");
-
-		start.setBounds(260, 35, 110, 33);
-		painel.add(start);
+		start.setForeground(new Color(255, 0, 0));
+		start.setBackground(new Color(255, 255, 255));
 		start.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				
-				crono();
-
+				 crono();
+				
 			}
 		});
-
-		lblNewLabel_2 = new JLabel("Total de Atualiza\u00E7oes");
-		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel_2.setBounds(134, 173, 151, 21);
-		painel.add(lblNewLabel_2);
-
+		start.setFont(new Font("Tahoma", Font.BOLD, 14));
+		start.setBounds(494, 36, 110, 33);
+		painel.add(start);
+		
+		
+		
 		stop = new JButton("Stop");
-
-		stop.setBounds(260, 80, 110, 33);
-		stop.setForeground(new Color(0, 0, 102));
+		stop.setForeground(new Color(255, 0, 0));
+		stop.setFont(new Font("Tahoma", Font.BOLD, 14));
+		stop.setBounds(494, 75, 110, 33);
 		painel.add(stop);
-		
-		posX = new JTextField();
-		posX.setBounds(10, 188, 86, 20);
-		painel.add(posX);
-		posX.setColumns(10);
-		
-		posY = new JTextField();
-		posY.setBounds(10, 219, 86, 20);
-		painel.add(posY);
-		posY.setColumns(10);
-		
+
 		stop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -152,14 +134,69 @@ public class Prime extends JFrame {
 				}
 			}
 		});
-
+		
+		lblNewLabel_2 = new JLabel("Total de Atualiza\u00E7oes");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblNewLabel_2.setBounds(274, 178, 151, 21);
+		painel.add(lblNewLabel_2);
+		
+		lblNewLabel = new JLabel("HOR\u00C1RIO DE BRASILIA");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setFont(new Font("Tw Cen MT", Font.BOLD, 14));
+		lblNewLabel.setBounds(465, 183, 163, 14);
+		painel.add(lblNewLabel);
+		
+		
+		hora = new JLabel("00:00:00");
+		painel.add(hora);
+		hora.setHorizontalAlignment(SwingConstants.CENTER);
+		hora.setBounds(484, 223, 120, 42);
+		hora.setFont(new Font("Dialog", Font.PLAIN, 28));
+		
+				update = new JLabel("00");
+				update.setBounds(311, 216, 56, 64);
+				painel.add(update);
+				update.setFont(new Font(update.getName(), Font.PLAIN, 50));
+				
+						horaTotal = new JLabel("00 00 00");
+						horaTotal.setBounds(274, 36, 196, 77);
+						painel.add(horaTotal);
+						horaTotal.setBackground(new Color(0, 255, 102));
+						horaTotal.setFont(new Font(horaTotal.getName(), Font.PLAIN, 50));
+		
+		
+	
 	}
 
-	
+	public void rodando() {
+		if (!horaRoda) {
+			horaRoda = true;
+			tm2 = new Timer();
+			tm2.scheduleAtFixedRate(new TimerTask() {
 
+				@Override
+				public void run() {
+					
+					
+						
+						Calendar c = Calendar.getInstance();
+						int h = c.get(Calendar.HOUR_OF_DAY);
+						int m = c.get(Calendar.MINUTE);
+						int s = c.get(Calendar.SECOND);
+						
+						hora.setText(String.format("%02d:%02d:%02d", h, m, s));
+					
+				
+				}
+			}, 1000, 1000);
+			
+		}
+	}
+	
+	
 	public void crono() {
 		cont++;
-
+		rodando();
 		if (!rodando) {
 			rodando = true;
 			tm = new Timer();
@@ -167,6 +204,8 @@ public class Prime extends JFrame {
 
 				@Override
 				public void run() {
+					
+					
 
 					s += 1;
 					s2 += 1;
@@ -185,18 +224,8 @@ public class Prime extends JFrame {
 						m = 0;
 					}
 
-					// controla tempo de atualizacao
-					if (s2 == 59) {
-						m2 += 1;
-						s2 = 0;
-					}
-
-					if (m2 == 59) {
-						m2 += 1;
-						s2 = 0;
-					}
-
-					if (h2 == 1) {
+					
+					if (h == 1) {
 						try {
 							upateCrono();
 							update.setText(String.format("%02d", cont++));// quantidade de atualizaçoes
@@ -204,17 +233,18 @@ public class Prime extends JFrame {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						h2 = 0;
+						h = 0;
 					}
-
+				
 				}
 			}, 1000, 1000);
-			// TODO Auto-generated method stub
+			
 		}
+		
+		
 	}
 
 	public void upateCrono() throws AWTException {
-
 		Robot optimusPrime;
 		optimusPrime = new Robot();
 		optimusPrime.setAutoDelay(1000);
